@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import 'reflect-metadata';
 import express, { Request, Response, NextFunction } from 'express';
 import 'express-async-errors';
@@ -13,6 +14,8 @@ const app = express();
 app.use(express.json());
 
 app.use(cors());
+
+dotenv.config();
 
 app.use('/files', express.static(uploadConfig.directory));
 
