@@ -12,7 +12,10 @@ todoRouter.get('/', async (req, res) => {
   const todoRepository = getRepository(Todo);
 
   const todo = await todoRepository.find({
-    where: { user_id: req.user.id, checked: false },
+    where: {
+      user_id: req.user.id,
+      checked: false,
+    },
   });
 
   return res.json(todo);
@@ -53,8 +56,8 @@ todoRouter.patch('/check', async (req, res) => {
   return res.json(todo);
 });
 
-todoRouter.delete('/', async (req, res) => {
-  const { id } = req.body;
+todoRouter.delete('/:id', async (req, res) => {
+  const { id } = req.params;
 
   const todoRepository = getRepository(Todo);
 
