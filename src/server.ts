@@ -13,32 +13,19 @@ const app = express();
 
 app.use(express.json());
 
-const allowedOrigins = [
-  'http://localhost:8080',
-  'https://todotoday.vercel.app',
-];
+dotenv.config();
 
 app.use(
   cors({
-    origin(origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          'The CORS policy for this site does not ' +
-          'allow access from the specified Origin.';
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
+    origin: process.env.URL_CORS,
   }),
 );
-
-dotenv.config();
 
 app.use('/files', express.static(uploadConfig.directory));
 
 app.use(routes);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, request: Request, response: Response, _: NextFunction) => {
   if (err instanceof AppError) {
     return response.status(err.statusCode).json({

@@ -1,6 +1,12 @@
 import { Router } from 'express';
 import { getRepository } from 'typeorm';
+
 import Todo from '../models/Todos';
+
+import CreateTodoService from '../services/CreateTodoService';
+import DeleteTodoService from '../services/DeleteTodoService';
+import ShowTodoStatusService from '../services/ShowTodoStatusService';
+import UpdateTodoCheckService from '../services/UpdateTodoCheckService';
 
 import verifyAuth from '../middlewares/verifyAuth';
 
@@ -24,34 +30,23 @@ todoRouter.get('/', async (req, res) => {
 todoRouter.post('/', async (req, res) => {
   const { title, content } = req.body;
 
-  const todoRepository = getRepository(Todo);
+  const todoService = new CreateTodoService();
 
-  const todoCreate = todoRepository.create({
+  const todo = await todoService.execute({
     title,
     user_id: req.user.id,
     content,
   });
 
-  todoRepository.save(todoCreate);
-
-  return res.json(todoCreate);
+  return res.json(todo);
 });
 
 todoRouter.patch('/check', async (req, res) => {
   const { id, checked } = req.body;
 
-  const todoRepository = getRepository(Todo);
+  const todoService = new UpdateTodoCheckService();
 
-  const findTodo = await todoRepository.findOne({
-    where: { id },
-  });
-
-  const todo = await todoRepository.create({
-    ...findTodo,
-    checked,
-  });
-
-  await todoRepository.save(todo);
+  const todo = await todoService.execute({ id, user_id: req.user.id, checked });
 
   return res.json(todo);
 });
@@ -59,28 +54,18 @@ todoRouter.patch('/check', async (req, res) => {
 todoRouter.delete('/:id', async (req, res) => {
   const { id } = req.params;
 
-  const todoRepository = getRepository(Todo);
+  const todoService = new DeleteTodoService();
 
-  await todoRepository.delete(id);
+  const todo = await todoService.execute({ id, user_id: req.user.id });
 
-  return res.status(200).send();
+  return res.json(todo);
 });
 
 todoRouter.get('/status', async (req, res) => {
-  const todoRepository = getRepository(Todo);
+  const todoService = new ShowTodoStatusService();
 
-  const doneTodo = await todoRepository.find({
-    where: { user_id: `${req.user.id}`, checked: true },
-  });
-
-  const unfinishedTodo = await todoRepository.find({
-    where: { user_id: `${req.user.id}`, checked: false },
-  });
-
-  const doneTodoSize = Object.keys(doneTodo).length;
-  const unfinishedTodoSize = Object.keys(unfinishedTodo).length;
-
-  return res.json({ done: doneTodoSize, unfinished: unfinishedTodoSize });
+  const todo = await todoService.execute({ user_id: req.user.id });
+  return res.json(todo);
 });
 
 export default todoRouter;
