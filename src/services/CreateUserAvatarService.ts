@@ -11,7 +11,11 @@ interface Return {
 }
 
 class CreateUserAvatar {
-  public async execute({ avatarFilename }: Request): Promise<Return> {
+  public async execute({ avatarFilename }: Request): Promise<Return | null> {
+    if (!avatarFilename) {
+      return null;
+    }
+
     const userAvatarFilePath = path.join(
       uploadConfig.directory,
       avatarFilename,

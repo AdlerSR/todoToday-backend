@@ -7,13 +7,16 @@ class ValidatorUser {
   constructor() {
     this.create = celebrate({
       [Segments.BODY]: Joi.object().keys({
-        name: Joi.string().required(),
-        email: Joi.string().required().email(),
+        name: Joi.string().required().error(new Error('Name is requires')),
+        email: Joi.string()
+          .required()
+          .email()
+          .error(new Error('Email is requires')),
         password: Joi.string()
           .required()
           .min(6)
-          .error(new Error('Name is required')),
-        avatar: Joi.string(),
+          .error(new Error('Password is requires')),
+        avatar: [Joi.string().optional(), Joi.allow(null)],
       }),
     });
   }
