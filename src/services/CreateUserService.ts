@@ -7,9 +7,15 @@ interface Request {
   name: string;
   email: string;
   password: string;
+  avatar: string;
 }
 class CreateUserService {
-  public async execute({ name, email, password }: Request): Promise<User> {
+  public async execute({
+    name,
+    email,
+    password,
+    avatar,
+  }: Request): Promise<User> {
     const userRepository = getRepository(User);
 
     const emailExists = await userRepository.findOne({ where: { email } });
@@ -20,7 +26,12 @@ class CreateUserService {
 
     const hashPassword = await hash(password, 8);
 
-    const user = userRepository.create({ name, email, password: hashPassword });
+    const user = userRepository.create({
+      name,
+      email,
+      password: hashPassword,
+      avatar,
+    });
 
     await userRepository.save(user);
 

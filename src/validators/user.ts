@@ -13,7 +13,7 @@ class ValidatorUser {
           .required()
           .min(6)
           .error(new Error('Name is required')),
-        perfil: Joi.string(),
+        avatar: Joi.string(),
       }),
     });
   }
